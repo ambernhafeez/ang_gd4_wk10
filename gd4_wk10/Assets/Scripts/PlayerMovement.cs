@@ -8,13 +8,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float runMultiplier = 1.5f;
     [SerializeField] float jumpForce = 5;
     [SerializeField] float gravity = 10f;
-    public float mouseSensitivity = 2f;
+    float mouseSensitivity = 6f;
     [SerializeField] float lookXlimit = 60f;
     float rotationX = 0;
     Vector3 moveDirection;
     CharacterController controller;
+
+    float minJumpStamina = 30;
+    float minRunStamina = 10;
     public float stamina = 100f;
-    public float staminaDrainSpeed = 20f;
+    public float staminaDrainSpeed = 40f;
     public Image staminaBar;
     void Start()
     {
@@ -37,10 +40,11 @@ public class PlayerMovement : MonoBehaviour
 
             moveDirection = (horizontalInput * transform.right) + (verticalInput * transform.forward);
 
-            if(Input.GetButtonDown("Jump"))
+            if(Input.GetButtonDown("Jump") && stamina >= minJumpStamina)
             // hardcoding jumping rather than relying on rigidbodies 
             {
                 moveDirection.y = jumpForce;
+                stamina -= minJumpStamina;
             }
             else 
             {
@@ -55,16 +59,16 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // sprint mechanic
-        if(Input.GetKeyDown(KeyCode.LeftShift) && stamina > 0) 
+        if(Input.GetKeyDown(KeyCode.LeftShift) && stamina >= minRunStamina) 
         { 
             moveSpeed *= runMultiplier;
         }
 
-        if(Input.GetKey(KeyCode.LeftShift) && stamina > 0)
+        if(Input.GetKey(KeyCode.LeftShift) && stamina >= minRunStamina)
         {
             // reduce stamina while key is pressed
             stamina -= Time.deltaTime * staminaDrainSpeed;
-            staminaBar.fillAmount = stamina / 100f;
+            StaminaBarUpdate();
         }
         else
         {
@@ -72,7 +76,7 @@ public class PlayerMovement : MonoBehaviour
             if(stamina < 100)
             {
                 stamina += Time.deltaTime * staminaDrainSpeed;
-                staminaBar.fillAmount = stamina / 100f;
+                StaminaBarUpdate();
             }
         }
         if(Input.GetKeyUp(KeyCode.LeftShift)) 
@@ -86,9 +90,11 @@ public class PlayerMovement : MonoBehaviour
         #endregion
 
         #region Rotation
-        // allow camera to rotate up and down
-        transform.Rotate(Vector3.up * mouseSensitivity * Time.deltaTime * Input.GetAxis("Mouse X"));
+        
+        // rotate player on y axis
+        transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * mouseSensitivity);
 
+        // allow camera to rotate up and down
         rotationX += -Input.GetAxis("Mouse Y") * mouseSensitivity;
         // check if rotation is trying to go outside of the look limit, stop it using clamp
         rotationX = Mathf.Clamp(rotationX, -lookXlimit, lookXlimit);
@@ -96,7 +102,11 @@ public class PlayerMovement : MonoBehaviour
         // change local rotation to rotationX while keeping other axes at 0
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
 
-
         #endregion
+    }
+
+    void StaminaBarUpdate()
+    {
+        staminaBar.fillAmount = stamina / 100f;
     }
 }
