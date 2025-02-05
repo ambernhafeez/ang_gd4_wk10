@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float runMultiplier = 1.5f;
     [SerializeField] float jumpForce = 5;
     [SerializeField] float gravity = 10f;
-    float mouseSensitivity = 6f;
+    float mouseSensitivity = 7f;
     [SerializeField] float lookXlimit = 60f;
     float rotationX = 0;
     Vector3 moveDirection;

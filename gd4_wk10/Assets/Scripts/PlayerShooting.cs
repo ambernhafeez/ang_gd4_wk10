@@ -82,6 +82,12 @@ public class PlayerShooting : MonoBehaviour
                     hit.rigidbody.AddForce(-hit.normal * hitForce, ForceMode.Impulse);
                 }
 
+                // trigger the ragdoll
+                EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
+                if(enemy != null) 
+                { 
+                    enemy.Damage(gunDamage);
+                }
 
                 // hit particle effect
                 Destroy(Instantiate(plasmaExplosion, hit.point, Quaternion.identity), 2);
@@ -119,4 +125,5 @@ public class PlayerShooting : MonoBehaviour
     {
         ammoBar.fillAmount = ammo / 10f;
     }
+    
 }
