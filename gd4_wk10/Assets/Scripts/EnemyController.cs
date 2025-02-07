@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Animations;
+using System.Collections;
 
 public class EnemyController : MonoBehaviour
 {
@@ -14,6 +15,10 @@ public class EnemyController : MonoBehaviour
     public bool dead = false;
     Vector3 currentDestination;
     [SerializeField] float followDistance = 20;
+    PlayerMovement playerScript;
+    GameObject playerObject;
+
+    float attackCooldown = 0;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -26,7 +31,9 @@ public class EnemyController : MonoBehaviour
         }
 
         _agent = GetComponent<NavMeshAgent>();
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        playerObject = GameObject.FindGameObjectWithTag("Player");
+        player = playerObject.transform;
+        playerScript = playerObject.GetComponent<PlayerMovement>();
         
     }
 
@@ -41,7 +48,7 @@ public class EnemyController : MonoBehaviour
                 Follow();
             }
             // when very close, do not follow player and attack
-            else if(Vector3.Distance(transform.position, player.position) <= 2)
+            else if(Vector3.Distance(transform.position, player.position) <= 2 && attackCooldown <= 0)
             {
                 Idle();
                 Attack();
@@ -50,6 +57,8 @@ public class EnemyController : MonoBehaviour
             {
                 Search();
             }
+
+            attackCooldown -= Time.deltaTime;
         }
     }
 
@@ -107,5 +116,8 @@ public class EnemyController : MonoBehaviour
     void Attack()
     {
         anim.SetTrigger("Attack");
+        playerScript.TakeDamage();
+        attackCooldown = 3;
     }
+
 }

@@ -20,6 +20,12 @@ public class PlayerMovement : MonoBehaviour
     public float stamina = 100f;
     public float staminaDrainSpeed = 40f;
     public Image staminaBar;
+
+    public float health = 100f;
+    public Image healthBar;
+
+    public bool gameOver = false;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -31,6 +37,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        
         #region Movement
         if(controller.isGrounded)
         {
@@ -110,5 +117,17 @@ public class PlayerMovement : MonoBehaviour
     void StaminaBarUpdate()
     {
         staminaBar.fillAmount = stamina / 100f;
+    }
+
+    public void TakeDamage()
+    {
+        health -= 10f;
+        Debug.Log("health = " + health);
+        healthBar.fillAmount = health / 100f;
+        if(health <= 0)
+        {
+            gameOver = true;
+            Debug.Log("game over");
+        }
     }
 }
